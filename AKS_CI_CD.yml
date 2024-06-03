@@ -1,0 +1,54 @@
+trigger:
+- none
+
+variables:
+- group: AKSVariables
+
+pool:
+  vmImage: 'windows-latest'
+
+resources:
+  - repo: self  
+
+name: $(date:yyyyMMdd)$(rev:.r)
+
+stages:
+- stage: CI
+  displayName: 'CI Stage'
+
+  jobs:
+  - job: Build
+    displayName: 'Build and Test'
+    steps:
+    - task: SonarQubePrepare@6
+      displayName: 'SonarQube Prepare'
+      inputs:
+        SonarQube: 'AzureSonarSC'
+        scannerMode: 'Other'
+        extraProperties: 'sonar.projectKey=aks-deployment'
+
+    - task: JavaToolInstaller@0
+      inputs:
+        versionSpec: '11'
+        jdkArchitectureOption: 'x64'
+        jdkSourceOption: 'PreInstalled'
+
+    - task: Maven@4
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'clean verify sonar:sonar'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        codeCoverageToolOption: 'Cobertura'
+        javaHomeOption: 'JDKVersion'
+        mavenVersionOption: 'Default'
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
+        sonarQubeRunAnalysis: true
+        sqMavenPluginVersionChoice: 'latest'
+
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
