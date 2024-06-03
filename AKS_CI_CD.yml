@@ -5,7 +5,7 @@ variables:
 - group: AKSVariables
 
 pool:
-  name: Default
+  vmImage: 'windows-latest'
 
 resources:
   - repo: self  
