@@ -21,22 +21,18 @@ stages:
     displayName: 'Build and Test'
     steps:
 
-    # - task: UseNode@1
-    #   inputs:
-    #     versionSpec: '16.x'
-    #   displayName: 'Install Node.js'
-    - task: SonarQubePrepare@6
-      displayName: 'SonarQube Prepare'
-      inputs:
-        SonarQube: 'AzureSonarSC'
-        scannerMode: 'Other'
-        extraProperties: 'sonar.projectKey=aks-deployment'
+    - checkout: self
+      clean: true
+      fetchDepth: 0
 
-    - task: JavaToolInstaller@0
+    - task: SonarCloudPrepare@2
       inputs:
-        versionSpec: '11'
-        jdkArchitectureOption: 'x64'
-        jdkSourceOption: 'PreInstalled'
+        SonarCloud: 'SonarCloud-Con'
+        organization: 'pranavtripathi'
+        scannerMode: 'Other'
+        extraProperties: |
+          sonar.projectKey=pranavtripathi_AKS-DockerDeployment
+          sonar.projectName=AKS-DockerDeployment
 
     - task: Maven@4
       inputs:
@@ -52,6 +48,9 @@ stages:
         sonarQubeRunAnalysis: true
         sqMavenPluginVersionChoice: 'latest'
 
+    - task: SonarCloudAnalyze@2
+      inputs:
+        jdkversion: 'JAVA_HOME'
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
