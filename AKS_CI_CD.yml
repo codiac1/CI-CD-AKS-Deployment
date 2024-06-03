@@ -51,6 +51,7 @@ stages:
     - task: SonarCloudAnalyze@2
       inputs:
         jdkversion: 'JAVA_HOME'
+           
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
