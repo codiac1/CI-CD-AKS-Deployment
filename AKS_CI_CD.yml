@@ -30,6 +30,7 @@ stages:
         versionSpec: '11'
         jdkArchitectureOption: 'x64'
         jdkSourceOption: 'PreInstalled'
+        jdkDestinationDirectory: '$(Agent.ToolsDirectory)/jdk'
         
     - task: SonarCloudPrepare@2
       inputs:
