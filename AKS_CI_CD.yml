@@ -34,14 +34,6 @@ stages:
           sonar.projectKey=pranavtripathi_AKS-DockerDeployment
           sonar.projectName=AKS-DockerDeployment
 
-    - task: JavaToolInstaller@0
-      inputs:
-        versionSpec: '11'
-        jdkArchitectureOption: 'x64'
-        jdkSourceOption: 'LocalDirectory'
-        jdkFile: '/usr/bin/java'
-        jdkDestinationDirectory: '$ (System.DefaultWorkingDirectory)'
-        cleanDestinationDirectory: true
     - task: Maven@4
       inputs:
         mavenPomFile: 'pom.xml'
