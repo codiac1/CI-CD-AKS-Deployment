@@ -47,7 +47,7 @@ stages:
         effectivePomSkip: false
         sonarQubeRunAnalysis: true
         isJacocoCoverageReportXML: true
-        sqMavenPluginVersionChoice: 'latest'
+        sqMavenPluginVersionChoice: 'pom'
 
     - task: SonarCloudAnalyze@2
       inputs:
