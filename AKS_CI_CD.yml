@@ -5,7 +5,7 @@ variables:
 - group: AKSVariables
 
 pool:
-  vmImage: 'windows-latest'
+  name: Azure-VM
 
 resources:
   - repo: self  
