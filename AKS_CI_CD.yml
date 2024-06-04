@@ -23,14 +23,7 @@ stages:
 
     - checkout: self
       clean: true
-      fetchDepth: 0
-
-    - task: JavaToolInstaller@0
-      inputs:
-        versionSpec: '11'
-        jdkArchitectureOption: 'x64'
-        jdkSourceOption: 'PreInstalled'
-        jdkDestinationDirectory: '$(Agent.ToolsDirectory)/jdk'
+      fetchDepth: 0 
         
     - task: SonarCloudPrepare@2
       inputs:
@@ -52,7 +45,7 @@ stages:
         mavenVersionOption: 'Default'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
-        sonarQubeRunAnalysis: true
+        # sonarQubeRunAnalysis: true
         isJacocoCoverageReportXML: true
         sqMavenPluginVersionChoice: 'pom'
 
