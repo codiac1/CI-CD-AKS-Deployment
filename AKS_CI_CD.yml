@@ -33,6 +33,10 @@ stages:
         extraProperties: |
           sonar.projectKey=pranavtripathi_AKS-DockerDeployment
           sonar.projectName=AKS-DockerDeployment
+    - task: Maven@4
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'clean cache'
 
     - task: Maven@4
       inputs:
@@ -45,7 +49,7 @@ stages:
         mavenVersionOption: 'Default'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
-        # sonarQubeRunAnalysis: true
+        sonarQubeRunAnalysis: true
         isJacocoCoverageReportXML: true
         sqMavenPluginVersionChoice: 'pom'
 
