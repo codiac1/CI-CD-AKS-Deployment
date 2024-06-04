@@ -40,12 +40,13 @@ stages:
         goals: 'clean verify sonar:sonar'
         publishJUnitResults: true
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
-        codeCoverageToolOption: 'Cobertura'
+        codeCoverageToolOption: 'JaCoCo'
         javaHomeOption: 'JDKVersion'
         mavenVersionOption: 'Default'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
         sonarQubeRunAnalysis: true
+        isJacocoCoverageReportXML: true
         sqMavenPluginVersionChoice: 'latest'
 
     - task: SonarCloudAnalyze@2
