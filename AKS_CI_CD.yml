@@ -34,10 +34,6 @@ stages:
         echo "Java Path: $PATH"
       displayName: 'Check Java Path'
 
-    - script: |
-        env
-      displayName: 'Print Environment Variables'
-
     - task: SonarCloudPrepare@2
       inputs:
         SonarCloud: 'SonarCloud-Con'
@@ -47,20 +43,20 @@ stages:
           sonar.projectKey=pranavtripathi_AKS-DockerDeployment
           sonar.projectName=AKS-DockerDeployment
 
-    # - task: Maven@4
-    #   inputs:
-    #     mavenPomFile: 'pom.xml'
-    #     goals: 'clean verify sonar:sonar'
-    #     publishJUnitResults: true
-    #     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    #     codeCoverageToolOption: 'JaCoCo'
-    #     javaHomeOption: 'JDKVersion'
-    #     mavenVersionOption: 'Default'
-    #     mavenAuthenticateFeed: false
-    #     effectivePomSkip: false
-    #     sonarQubeRunAnalysis: true
-    #     isJacocoCoverageReportXML: true
-    #     sqMavenPluginVersionChoice: 'pom'
+    - task: Maven@4
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'clean verify sonar:sonar'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        codeCoverageToolOption: 'JaCoCo'
+        javaHomeOption: 'JDKVersion'
+        mavenVersionOption: 'Default'
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
+        sonarQubeRunAnalysis: true
+        isJacocoCoverageReportXML: true
+        sqMavenPluginVersionChoice: 'pom'
 
     # - task: SonarCloudAnalyze@2
     #   inputs:
