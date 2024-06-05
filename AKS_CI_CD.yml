@@ -24,7 +24,16 @@ stages:
     - checkout: self
       clean: true
       fetchDepth: 0 
-        
+
+    - script: |
+        java -version
+      displayName: 'Check Java Version'
+
+    - script: |
+        echo "Java Home: %JAVA_HOME%"
+        echo "Java Path: %PATH%"
+      displayName: 'Check Java Path'
+
     - task: SonarCloudPrepare@2
       inputs:
         SonarCloud: 'SonarCloud-Con'
@@ -34,27 +43,27 @@ stages:
           sonar.projectKey=pranavtripathi_AKS-DockerDeployment
           sonar.projectName=AKS-DockerDeployment
 
-    - task: Maven@4
-      inputs:
-        mavenPomFile: 'pom.xml'
-        goals: 'clean verify sonar:sonar'
-        publishJUnitResults: true
-        testResultsFiles: '**/surefire-reports/TEST-*.xml'
-        codeCoverageToolOption: 'JaCoCo'
-        javaHomeOption: 'JDKVersion'
-        mavenVersionOption: 'Default'
-        mavenAuthenticateFeed: false
-        effectivePomSkip: false
-        sonarQubeRunAnalysis: true
-        isJacocoCoverageReportXML: true
-        sqMavenPluginVersionChoice: 'pom'
+    # - task: Maven@4
+    #   inputs:
+    #     mavenPomFile: 'pom.xml'
+    #     goals: 'clean verify sonar:sonar'
+    #     publishJUnitResults: true
+    #     testResultsFiles: '**/surefire-reports/TEST-*.xml'
+    #     codeCoverageToolOption: 'JaCoCo'
+    #     javaHomeOption: 'JDKVersion'
+    #     mavenVersionOption: 'Default'
+    #     mavenAuthenticateFeed: false
+    #     effectivePomSkip: false
+    #     sonarQubeRunAnalysis: true
+    #     isJacocoCoverageReportXML: true
+    #     sqMavenPluginVersionChoice: 'pom'
 
-    - task: SonarCloudAnalyze@2
-      inputs:
-        jdkversion: 'JAVA_HOME'
+    # - task: SonarCloudAnalyze@2
+    #   inputs:
+    #     jdkversion: 'JAVA_HOME'
            
-    - task: PublishBuildArtifacts@1
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+    # - task: PublishBuildArtifacts@1
+    #   inputs:
+    #     PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    #     ArtifactName: 'drop'
+    #     publishLocation: 'Container'
