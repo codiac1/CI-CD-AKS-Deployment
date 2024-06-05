@@ -25,13 +25,6 @@ stages:
       clean: true
       fetchDepth: 0 
 
-    - task: JavaToolInstaller@0
-      inputs:
-        versionSpec: '11'
-        jdkArchitectureOption: 'x64'
-        jdkSourceOption: 'PreInstalled'
-
-
     - script: |
         java -version
       displayName: 'Check Java Version'
