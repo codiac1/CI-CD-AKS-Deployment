@@ -1,3 +1,5 @@
+package com.example.javaease;
+
 import com.example.javaease.ServletInitializer;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.builder.SpringApplicationBuilder;
