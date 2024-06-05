@@ -1,4 +1,4 @@
-package com.example.javaEase;
+package com.example.javaease;
 
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;

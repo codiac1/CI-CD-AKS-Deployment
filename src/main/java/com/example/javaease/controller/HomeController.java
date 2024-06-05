@@ -1,4 +1,4 @@
-package com.example.javaEase.controller;
+package com.example.javaease.controller;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
