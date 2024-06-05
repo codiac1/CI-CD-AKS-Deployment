@@ -30,9 +30,13 @@ stages:
       displayName: 'Check Java Version'
 
     - script: |
-        echo "Java Home: %JAVA_HOME%"
-        echo "Java Path: %PATH%"
+        echo "Java Home: $JAVA_HOME"
+        echo "Java Path: $PATH"
       displayName: 'Check Java Path'
+
+    - script: |
+        env
+      displayName: 'Print Environment Variables'
 
     - task: SonarCloudPrepare@2
       inputs:
