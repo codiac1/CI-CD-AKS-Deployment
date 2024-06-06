@@ -35,6 +35,7 @@ stages:
           sonar.projectName=AKS-DockerDeployment
 
     - task: Maven@4
+      displayName: 'Build and Test with Sonar Code analysis'
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'clean verify sonar:sonar'
@@ -62,3 +63,10 @@ stages:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
+    
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'dockerhub_connection'
+        repository: 'pranav2510/aks-deploy'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
