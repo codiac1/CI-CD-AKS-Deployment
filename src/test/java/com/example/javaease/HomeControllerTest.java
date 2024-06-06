@@ -38,7 +38,6 @@ class HomeControllerTest {
         String name = "TestName";
         String content = homeController.welcome(name);
         assertNotNull(content);
-        //assertTrue(content.contains("<span>TestName</span>"));
         assertTrue(content.contains(", welcome to Java Ease"));
     }
 
