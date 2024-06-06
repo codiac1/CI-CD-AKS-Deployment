@@ -47,12 +47,16 @@ stages:
         effectivePomSkip: false
         sonarQubeRunAnalysis: true
         isJacocoCoverageReportXML: true
-        sqMavenPluginVersionChoice: 'pom'
+        codeCoverageRestoreOriginalPomXml: true
+        sqMavenPluginVersionChoice: 'latest'
 
-    - task: SonarCloudAnalyze@2
+    - task: CopyFiles@2
       inputs:
-        jdkversion: 'JAVA_HOME'
-           
+        SourceFolder: '$(Build.SourcesDirectory)/target'
+        Contents: '**/*.war'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        OverWrite: true
+        
     - task: PublishBuildArtifacts@1
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
