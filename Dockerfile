@@ -1,4 +1,4 @@
-tomcat:10.1-jdk17-openjdk
+FROM tomcat:10.1-jdk17-openjdk
 
 # Set the working directory
 WORKDIR /usr/local/tomcat
