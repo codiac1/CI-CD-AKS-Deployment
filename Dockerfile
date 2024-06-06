@@ -1,5 +1,5 @@
-# Use the official Tomcat base image
-FROM tomcat:9.0.73-jdk11-openjdk
+# Use the official Tomcat base image with Java 17
+FROM tomcat:10.1.9-jdk17-openjdk
 
 # Set the working directory
 WORKDIR /usr/local/tomcat
