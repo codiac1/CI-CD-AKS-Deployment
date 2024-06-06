@@ -69,4 +69,4 @@ stages:
         containerRegistry: 'dockerhub_connection'
         repository: 'pranav2510/aks-deploy'
         command: 'buildAndPush'
-        Dockerfile: '**/Dockerfile'
+        Dockerfile: 'Dockerfile'
