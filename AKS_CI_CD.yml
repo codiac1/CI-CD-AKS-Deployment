@@ -71,3 +71,28 @@ stages:
         command: 'buildAndPush'
         Dockerfile: 'Dockerfile'
         tags: 'latest'
+
+
+- stage: CD
+  displayName: 'Deploy Stage'
+  dependsOn: CI
+
+  jobs:
+  - job: Deploy
+    displayName: 'Deploy to AKS'
+    steps:
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'AKS-Connection'
+        namespace: 'default'
+        command: 'apply'
+        arguments: '-f deployment.yaml'
+
+    - task: Kubernetes@1
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: 'AKS-Connection'
+        namespace: 'default'
+        command: 'apply'
+        arguments: '-f service.yaml'
