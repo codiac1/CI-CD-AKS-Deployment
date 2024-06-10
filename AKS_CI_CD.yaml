@@ -67,6 +67,7 @@ stages:
     - task: Docker@2
       inputs:
         containerRegistry: 'ACR-connection'
-        repository: 'pranav2510/aks-deploy'
+        repository: 'aks-deploy-javaapp'
         command: 'buildAndPush'
         Dockerfile: 'Dockerfile'
+        tags: 'latest'
