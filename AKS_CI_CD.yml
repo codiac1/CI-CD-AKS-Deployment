@@ -52,16 +52,16 @@ stages:
         codeCoverageRestoreOriginalPomXml: true
         sqMavenPluginVersionChoice: 'latest'
 
-    - task: dependency-check-build-task@6
-      displayName: 'OWASP Dependency Check'
-      inputs:
-        projectName: '$(Build.Repository.Name)'
-        scanPath: '.'
-        format: 'HTML'
-        uploadReports: true
-        warnOnCVSSViolation: true
-        enableVerbose: true
-        nvdApiKey: '$(NVDApiKey)'
+    # - task: dependency-check-build-task@6
+    #   displayName: 'OWASP Dependency Check'
+    #   inputs:
+    #     projectName: '$(Build.Repository.Name)'
+    #     scanPath: '.'
+    #     format: 'HTML'
+    #     uploadReports: true
+    #     warnOnCVSSViolation: true
+    #     enableVerbose: true
+    #     nvdApiKey: '$(NVDApiKey)'
 
     - task: CopyFiles@2
       displayName: 'Copying files'
@@ -88,10 +88,10 @@ stages:
         tags: 'latest'
 
     - task: trivy@1
+      displayName: 'Scan Docker Image with Trivy'
       inputs:
         version: 'latest'
-        path: '.'
-        image: 'aks-deploy-javaapp:latest'
+        image: '$(Repository):latest'
 
     - task: Docker@2
       displayName: 'Push Docker Image to ACR'
