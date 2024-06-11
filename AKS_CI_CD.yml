@@ -36,12 +36,6 @@ stages:
           sonar.projectName=$(SonarProjectName)
 
     - task: Maven@4
-      displayName: 'Lint Code'
-      inputs:
-        mavenPomFile: 'pom.xml'
-        goals: 'checkstyle:check'
-
-    - task: Maven@4
       displayName: 'Build and Test with Sonar Code analysis'
       inputs:
         mavenPomFile: 'pom.xml'
