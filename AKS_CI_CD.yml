@@ -77,7 +77,7 @@ stages:
         tags: 'latest'
 
     - script: |
-        trivy image --no-progress $(Build.Repository.Uri):$(Build.BuildId)
+        trivy image --format json -v .
       displayName: 'Scan Docker Image with Trivy'
 
     - task: Docker@2
