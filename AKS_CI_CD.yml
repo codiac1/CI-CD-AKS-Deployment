@@ -87,7 +87,7 @@ stages:
       displayName: 'Scan Docker Image with Trivy'
 
 - stage: CD
-  displayName: 'Deploy Stage'
+  displayName: 'CD Stage'
   dependsOn: CI
 
   jobs:
