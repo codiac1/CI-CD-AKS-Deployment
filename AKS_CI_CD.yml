@@ -52,6 +52,15 @@ stages:
         codeCoverageRestoreOriginalPomXml: true
         sqMavenPluginVersionChoice: 'latest'
 
+    - task: dependency-check-build-task@6
+      inputs:
+        projectName: 'javawebapp'
+        scanPath: '.'
+        format: 'HTML'
+        uploadReports: true
+        warnOnCVSSViolation: true
+        enableVerbose: true
+
     - task: CopyFiles@2
       displayName: 'Copying files'
       inputs:
@@ -76,9 +85,9 @@ stages:
         Dockerfile: 'Dockerfile'
         tags: 'latest'
 
-    - script: |
-        trivy image --format json -v $(Build.SourcesDirectory)
-      displayName: 'Scan Docker Image with Trivy'
+    # - script: |
+    #     trivy image --format json -v $(Build.SourcesDirectory)
+    #   displayName: 'Scan Docker Image with Trivy'
 
     - task: Docker@2
       displayName: 'Push Docker Image to ACR'
