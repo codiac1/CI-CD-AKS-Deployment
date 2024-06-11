@@ -27,12 +27,12 @@ stages:
 
     - task: SonarCloudPrepare@2
       inputs:
-        SonarCloud: 'SonarCloud-Con'
-        organization: 'pranavtripathi'
+        SonarCloud: '$(SonarCloud)'
+        organization: '$(SonarOrganization)'
         scannerMode: 'Other'
         extraProperties: |
-          sonar.projectKey=pranavtripathi_AKS-DockerDeployment
-          sonar.projectName=AKS-DockerDeployment
+          sonar.projectKey=$(SonarProjectKey)
+          sonar.projectName=$(SonarProjectName)
 
     - task: Maven@4
       displayName: 'Build and Test with Sonar Code analysis'
@@ -66,12 +66,15 @@ stages:
     
     - task: Docker@2
       inputs:
-        containerRegistry: 'ACR-connection'
-        repository: 'aks-deploy-javaapp'
+        containerRegistry: '$(ContainerRegistry)'
+        repository: '$(Repository)'
         command: 'buildAndPush'
         Dockerfile: 'Dockerfile'
         tags: 'latest'
 
+    - script: |
+        trivy image $(ContainerRegistry)/$(Repository):latest
+      displayName: 'Scan Docker Image with Trivy'
 
 - stage: CD
   displayName: 'Deploy Stage'
@@ -84,7 +87,7 @@ stages:
     - task: Kubernetes@1
       inputs:
         connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceEndpoint: 'AKS-Connection'
+        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
         namespace: 'default'
         command: 'apply'
         arguments: '-f deployment.yaml'
@@ -92,7 +95,7 @@ stages:
     - task: Kubernetes@1
       inputs:
         connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceEndpoint: 'AKS-Connection'
+        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
         namespace: 'default'
         command: 'apply'
         arguments: '-f service.yaml'
