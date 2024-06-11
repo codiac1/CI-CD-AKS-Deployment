@@ -25,32 +25,32 @@ stages:
       clean: true
       fetchDepth: 0 
 
-    # - task: SonarCloudPrepare@2
-    #   displayName: 'Preparing Sonar Cloud Analysis'
-    #   inputs:
-    #     SonarCloud: '$(SonarCloud)'
-    #     organization: '$(SonarOrganization)'
-    #     scannerMode: 'Other'
-    #     extraProperties: |
-    #       sonar.projectKey=$(SonarProjectKey)
-    #       sonar.projectName=$(SonarProjectName)
+    - task: SonarCloudPrepare@2
+      displayName: 'Preparing Sonar Cloud Analysis'
+      inputs:
+        SonarCloud: '$(SonarCloud)'
+        organization: '$(SonarOrganization)'
+        scannerMode: 'Other'
+        extraProperties: |
+          sonar.projectKey=$(SonarProjectKey)
+          sonar.projectName=$(SonarProjectName)
 
-    # - task: Maven@4
-    #   displayName: 'Build and Test with Sonar Code analysis'
-    #   inputs:
-    #     mavenPomFile: 'pom.xml'
-    #     goals: 'clean verify sonar:sonar'
-    #     publishJUnitResults: true
-    #     testResultsFiles: '**/surefire-reports/TEST-*.xml'
-    #     codeCoverageToolOption: 'JaCoCo'
-    #     javaHomeOption: 'JDKVersion'
-    #     mavenVersionOption: 'Default'
-    #     mavenAuthenticateFeed: false
-    #     effectivePomSkip: false
-    #     sonarQubeRunAnalysis: true
-    #     isJacocoCoverageReportXML: true
-    #     codeCoverageRestoreOriginalPomXml: true
-    #     sqMavenPluginVersionChoice: 'latest'
+    - task: Maven@4
+      displayName: 'Build and Test with Sonar Code analysis'
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'clean verify sonar:sonar'
+        publishJUnitResults: true
+        testResultsFiles: '**/surefire-reports/TEST-*.xml'
+        codeCoverageToolOption: 'JaCoCo'
+        javaHomeOption: 'JDKVersion'
+        mavenVersionOption: 'Default'
+        mavenAuthenticateFeed: false
+        effectivePomSkip: false
+        sonarQubeRunAnalysis: true
+        isJacocoCoverageReportXML: true
+        codeCoverageRestoreOriginalPomXml: true
+        sqMavenPluginVersionChoice: 'latest'
 
     - task: dependency-check-build-task@6
       displayName: 'OWASP Dependency Check'
@@ -63,41 +63,43 @@ stages:
         enableVerbose: true
         nvdApiKey: '$(NVDApiKey)'
 
-#     - task: CopyFiles@2
-#       displayName: 'Copying files'
-#       inputs:
-#         SourceFolder: '$(Build.SourcesDirectory)/target'
-#         Contents: '**/*.jar'
-#         TargetFolder: '$(Build.ArtifactStagingDirectory)/target'
-#         OverWrite: true
+    - task: CopyFiles@2
+      displayName: 'Copying files'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/target'
+        Contents: '**/*.jar'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/target'
+        OverWrite: true
         
-#     - task: PublishBuildArtifacts@1
-#       displayName: 'Publishing Artifacts'
-#       inputs:
-#         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-#         ArtifactName: 'drop'
-#         publishLocation: 'Container'
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publishing Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'drop'
+        publishLocation: 'Container'
     
-#     - task: Docker@2
-#       displayName: 'Build Docker Image'
-#       inputs:
-#         containerRegistry: '$(ContainerRegistry)'
-#         repository: '$(Repository)'
-#         command: 'build'
-#         Dockerfile: 'Dockerfile'
-#         tags: 'latest'
+    - task: Docker@2
+      displayName: 'Build Docker Image'
+      inputs:
+        containerRegistry: '$(ContainerRegistry)'
+        repository: '$(Repository)'
+        command: 'build'
+        Dockerfile: 'Dockerfile'
+        tags: 'latest'
 
-#     # - script: |
-#     #     trivy image --format json -v $(Build.SourcesDirectory)
-#     #   displayName: 'Scan Docker Image with Trivy'
+    - task: trivy@1
+      inputs:
+        version: 'latest'
+        path: '.'
+        image: 'aks-deploy-javaapp:latest'
 
-#     - task: Docker@2
-#       displayName: 'Push Docker Image to ACR'
-#       inputs:
-#         containerRegistry: '$(ContainerRegistry)'
-#         repository: '$(Repository)'
-#         command: 'push'
-#         tags: 'latest'
+    - task: Docker@2
+      displayName: 'Push Docker Image to ACR'
+      inputs:
+        containerRegistry: '$(ContainerRegistry)'
+        repository: '$(Repository)'
+        command: 'push'
+        tags: 'latest'
 
 # - stage: CD
 #   displayName: 'CD Stage'
