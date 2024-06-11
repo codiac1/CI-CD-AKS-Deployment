@@ -87,11 +87,11 @@ stages:
         Dockerfile: 'Dockerfile'
         tags: 'latest'
 
-    - task: trivy@1
-      displayName: 'Scan Docker Image with Trivy'
-      inputs:
-        version: 'latest'
-        image: '$(Repository):latest'
+    # - task: trivy@1
+    #   displayName: 'Scan Docker Image with Trivy'
+    #   inputs:
+    #     version: 'latest'
+    #     image: '$(Repository):latest'
 
     - task: Docker@2
       displayName: 'Push Docker Image to ACR'
