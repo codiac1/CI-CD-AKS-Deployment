@@ -26,6 +26,7 @@ stages:
       fetchDepth: 0 
 
     - task: SonarCloudPrepare@2
+      displayName: 'Preparing Sonar Cloud Analysis'
       inputs:
         SonarCloud: '$(SonarCloud)'
         organization: '$(SonarOrganization)'
@@ -33,6 +34,12 @@ stages:
         extraProperties: |
           sonar.projectKey=$(SonarProjectKey)
           sonar.projectName=$(SonarProjectName)
+
+    - task: Maven@4
+      displayName: 'Lint Code'
+      inputs:
+        mavenPomFile: 'pom.xml'
+        goals: 'checkstyle:check'
 
     - task: Maven@4
       displayName: 'Build and Test with Sonar Code analysis'
@@ -52,6 +59,7 @@ stages:
         sqMavenPluginVersionChoice: 'latest'
 
     - task: CopyFiles@2
+      displayName: 'Copying files'
       inputs:
         SourceFolder: '$(Build.SourcesDirectory)/target'
         Contents: '**/*.jar'
@@ -59,12 +67,14 @@ stages:
         OverWrite: true
         
     - task: PublishBuildArtifacts@1
+      displayName: 'Publishing Artifacts'
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
     
     - task: Docker@2
+      displayName: 'Build and Push Docker Image to ACR'
       inputs:
         containerRegistry: '$(ContainerRegistry)'
         repository: '$(Repository)'
@@ -85,6 +95,7 @@ stages:
     displayName: 'Deploy to AKS'
     steps:
     - task: Kubernetes@1
+      displayName: 'Deploying the menifest to AKS cluster'
       inputs:
         connectionType: 'Kubernetes Service Connection'
         kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
@@ -93,6 +104,7 @@ stages:
         arguments: '-f deployment.yaml'
 
     - task: Kubernetes@1
+      displayName: 'Setting up the Services for AKS Cluster'
       inputs:
         connectionType: 'Kubernetes Service Connection'
         kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
