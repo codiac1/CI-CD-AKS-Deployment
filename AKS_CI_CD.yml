@@ -77,7 +77,7 @@ stages:
         tags: 'latest'
 
     - script: |
-        trivy image $(ContainerRegistry)/$(Repository):latest
+        trivy image $(Repository):latest
       displayName: 'Scan Docker Image with Trivy'
 
 - stage: CD
