@@ -52,16 +52,16 @@ stages:
         codeCoverageRestoreOriginalPomXml: true
         sqMavenPluginVersionChoice: 'latest'
 
-    # - task: dependency-check-build-task@6
-    #   displayName: 'OWASP Dependency Check'
-    #   inputs:
-    #     projectName: '$(Build.Repository.Name)'
-    #     scanPath: '.'
-    #     format: 'HTML'
-    #     uploadReports: true
-    #     warnOnCVSSViolation: true
-    #     enableVerbose: true
-    #     nvdApiKey: '$(NVDApiKey)'
+    - task: dependency-check-build-task@6
+      displayName: 'OWASP Dependency Check'
+      inputs:
+        projectName: '$(Build.Repository.Name)'
+        scanPath: '.'
+        format: 'HTML'
+        uploadReports: true
+        warnOnCVSSViolation: true
+        enableVerbose: true
+        nvdApiKey: '$(NVDApiKey)'
 
     - task: CopyFiles@2
       displayName: 'Copying files'
@@ -87,12 +87,6 @@ stages:
         Dockerfile: 'Dockerfile'
         tags: 'latest'
 
-    # - task: trivy@1
-    #   displayName: 'Scan Docker Image with Trivy'
-    #   inputs:
-    #     version: 'latest'
-    #     image: '$(Repository):latest'
-
     - task: Docker@2
       displayName: 'Push Docker Image to ACR'
       inputs:
@@ -101,28 +95,28 @@ stages:
         command: 'push'
         tags: 'latest'
 
-# - stage: CD
-#   displayName: 'CD Stage'
-#   dependsOn: CI
+- stage: CD
+  displayName: 'CD Stage'
+  dependsOn: CI
 
-#   jobs:
-#   - job: Deploy
-#     displayName: 'Deploy to AKS'
-#     steps:
-#     - task: Kubernetes@1
-#       displayName: 'Deploying the menifest to AKS cluster'
-#       inputs:
-#         connectionType: 'Kubernetes Service Connection'
-#         kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
-#         namespace: 'default'
-#         command: 'apply'
-#         arguments: '-f deployment.yaml'
+  jobs:
+  - job: Deploy
+    displayName: 'Deploy to AKS'
+    steps:
+    - task: Kubernetes@1
+      displayName: 'Deploying the menifest to AKS cluster'
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
+        namespace: 'default'
+        command: 'apply'
+        arguments: '-f deployment.yaml'
 
-#     - task: Kubernetes@1
-#       displayName: 'Setting up the Services for AKS Cluster'
-#       inputs:
-#         connectionType: 'Kubernetes Service Connection'
-#         kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
-#         namespace: 'default'
-#         command: 'apply'
-#         arguments: '-f service.yaml'
+    - task: Kubernetes@1
+      displayName: 'Setting up the Services for AKS Cluster'
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
+        namespace: 'default'
+        command: 'apply'
+        arguments: '-f service.yaml'
