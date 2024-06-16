@@ -5,7 +5,7 @@ variables:
 - group: AKSVariables
 
 pool:
-  vmImage: 'windows-latest'
+  name: Azure-VM
 
 resources:
   - repo: self  
@@ -20,35 +20,103 @@ stages:
   - job: Build
     displayName: 'Build and Test'
     steps:
-    - task: SonarQubePrepare@6
-      displayName: 'SonarQube Prepare'
-      inputs:
-        SonarQube: 'AzureSonarSC'
-        scannerMode: 'Other'
-        extraProperties: 'sonar.projectKey=aks-deployment'
 
-    - task: JavaToolInstaller@0
+    - checkout: self
+      clean: true
+      fetchDepth: 0 
+
+    - task: SonarCloudPrepare@2
+      displayName: 'Preparing Sonar Cloud Analysis'
       inputs:
-        versionSpec: '11'
-        jdkArchitectureOption: 'x64'
-        jdkSourceOption: 'PreInstalled'
+        SonarCloud: '$(SonarCloud)'
+        organization: '$(SonarOrganization)'
+        scannerMode: 'Other'
+        extraProperties: |
+          sonar.projectKey=$(SonarProjectKey)
+          sonar.projectName=$(SonarProjectName)
 
     - task: Maven@4
+      displayName: 'Build and Test with Sonar Code analysis'
       inputs:
         mavenPomFile: 'pom.xml'
         goals: 'clean verify sonar:sonar'
         publishJUnitResults: true
         testResultsFiles: '**/surefire-reports/TEST-*.xml'
-        codeCoverageToolOption: 'Cobertura'
+        codeCoverageToolOption: 'JaCoCo'
         javaHomeOption: 'JDKVersion'
         mavenVersionOption: 'Default'
         mavenAuthenticateFeed: false
         effectivePomSkip: false
         sonarQubeRunAnalysis: true
+        isJacocoCoverageReportXML: true
+        codeCoverageRestoreOriginalPomXml: true
         sqMavenPluginVersionChoice: 'latest'
 
+    - task: dependency-check-build-task@6
+      displayName: 'OWASP Dependency Check'
+      inputs:
+        projectName: '$(Build.Repository.Name)'
+        scanPath: '.'
+        format: 'HTML'
+        uploadReports: true
+        warnOnCVSSViolation: true
+        enableVerbose: true
+        nvdApiKey: '$(NVDApiKey)'
+
+    - task: CopyFiles@2
+      displayName: 'Copying files'
+      inputs:
+        SourceFolder: '$(Build.SourcesDirectory)/target'
+        Contents: '**/*.jar'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)/target'
+        OverWrite: true
+        
     - task: PublishBuildArtifacts@1
+      displayName: 'Publishing Artifacts'
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
         ArtifactName: 'drop'
         publishLocation: 'Container'
+    
+    - task: Docker@2
+      displayName: 'Build Docker Image'
+      inputs:
+        containerRegistry: '$(ContainerRegistry)'
+        repository: '$(Repository)'
+        command: 'build'
+        Dockerfile: 'Dockerfile'
+        tags: 'latest'
+
+    - task: Docker@2
+      displayName: 'Push Docker Image to ACR'
+      inputs:
+        containerRegistry: '$(ContainerRegistry)'
+        repository: '$(Repository)'
+        command: 'push'
+        tags: 'latest'
+
+- stage: CD
+  displayName: 'CD Stage'
+  dependsOn: CI
+
+  jobs:
+  - job: Deploy
+    displayName: 'Deploy to AKS'
+    steps:
+    - task: Kubernetes@1
+      displayName: 'Deploying the menifest to AKS cluster'
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
+        namespace: 'default'
+        command: 'apply'
+        arguments: '-f deployment.yaml'
+
+    - task: Kubernetes@1
+      displayName: 'Setting up the Services for AKS Cluster'
+      inputs:
+        connectionType: 'Kubernetes Service Connection'
+        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
+        namespace: 'default'
+        command: 'apply'
+        arguments: '-f service.yaml'

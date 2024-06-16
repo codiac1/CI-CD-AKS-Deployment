@@ -1,8 +1,8 @@
-package com.example.javaEase.controller;
+package com.example.javaease.controller;
 
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
-import org.springframework.stereotype.Controller;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,7 +26,7 @@ public class HomeController {
 				.replace("{name}", name);
 	}
 
-	private String getHtmlContent(String fileName) {
+	public String getHtmlContent(String fileName) {
 		Resource resource = new ClassPathResource("static/" + fileName);
 		try (InputStream inputStream = resource.getInputStream()) {
 			BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
