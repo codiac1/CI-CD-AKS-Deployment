@@ -113,7 +113,7 @@ stages:
         arguments: '-f deployment.yaml'
 
     - task: Kubernetes@1
-      displayName: 'Setting up the Services for AKS Cluster'
+      displayName: 'Setting up the Services'
       inputs:
         connectionType: 'Kubernetes Service Connection'
         kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
