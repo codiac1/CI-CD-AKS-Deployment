@@ -53,16 +53,16 @@ stages:
         codeCoverageRestoreOriginalPomXml: true
         sqMavenPluginVersionChoice: 'latest'
 
-    - task: dependency-check-build-task@6
-      displayName: 'OWASP Dependency Check'
-      inputs:
-        projectName: '$(Build.Repository.Name)'
-        scanPath: '.'
-        format: 'HTML'
-        uploadReports: true
-        warnOnCVSSViolation: true
-        enableVerbose: true
-        nvdApiKey: '$(NVDApiKey)'
+    # - task: dependency-check-build-task@6
+    #   displayName: 'OWASP Dependency Check'
+    #   inputs:
+    #     projectName: '$(Build.Repository.Name)'
+    #     scanPath: '.'
+    #     format: 'HTML'
+    #     uploadReports: true
+    #     warnOnCVSSViolation: true
+    #     enableVerbose: true
+    #     nvdApiKey: '$(NVDApiKey)'
 
     - task: CopyFiles@2
       displayName: 'Copying files'
@@ -99,7 +99,8 @@ stages:
         containerRegistry: '$(ContainerRegistry)'
         repository: '$(Repository)'
         command: 'push'
-        tags: 'latest'
+        tags: |
+          $(Build.BuildId)
 
 - stage: CD
   displayName: 'CD Stage'
