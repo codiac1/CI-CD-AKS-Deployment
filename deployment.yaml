@@ -12,8 +12,6 @@ spec:
       labels:
         app: javawebapp
     spec:
-      imagePullSecrets:
-      - name: acr-secret
       containers:
       - name: javawebapp
         image: acraksdeploy.azurecr.io/aks-deploy-javaapp
