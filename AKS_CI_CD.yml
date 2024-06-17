@@ -52,23 +52,23 @@ stages:
         codeCoverageRestoreOriginalPomXml: true
         sqMavenPluginVersionChoice: 'latest'
 
-    # - task: dependency-check-build-task@6
-    #   displayName: 'OWASP Dependency Check'
-    #   inputs:
-    #     projectName: '$(Build.Repository.Name)'
-    #     scanPath: '.'
-    #     format: 'HTML'
-    #     uploadReports: true
-    #     warnOnCVSSViolation: true
-    #     enableVerbose: true
-    #     nvdApiKey: '$(NVDApiKey)'
+    - task: dependency-check-build-task@6
+      displayName: 'OWASP Dependency Check'
+      inputs:
+        projectName: '$(Build.Repository.Name)'
+        scanPath: '.'
+        format: 'HTML'
+        uploadReports: true
+        warnOnCVSSViolation: true
+        enableVerbose: true
+        nvdApiKey: '$(NVDApiKey)'
 
     - task: CopyFiles@2
       displayName: 'Copying files'
       inputs:
         SourceFolder: '$(Build.SourcesDirectory)'
         Contents: |
-          target/**
+          target/*.jar
           deployment.yaml
           service.yaml
         TargetFolder: '$(Build.ArtifactStagingDirectory)'
@@ -82,51 +82,51 @@ stages:
         ArtifactName: 'artifacts'
         publishLocation: 'Container'
 
-    # - task: Docker@2
-    #   displayName: 'Build Docker Image'
-    #   inputs:
-    #     containerRegistry: '$(ContainerRegistry)'
-    #     repository: '$(Repository)'
-    #     command: 'build'
-    #     Dockerfile: 'Dockerfile'
-    #     tags: 'latest'
+    - task: Docker@2
+      displayName: 'Build Docker Image'
+      inputs:
+        containerRegistry: '$(ContainerRegistry)'
+        repository: '$(Repository)'
+        command: 'build'
+        Dockerfile: 'Dockerfile'
+        tags: 'latest'
 
-    # - task: Docker@2
-    #   displayName: 'Push Docker Image to ACR'
-    #   inputs:
-    #     containerRegistry: '$(ContainerRegistry)'
-    #     repository: '$(Repository)'
-    #     command: 'push'
-    #     tags: 'latest'
+    - task: Docker@2
+      displayName: 'Push Docker Image to ACR'
+      inputs:
+        containerRegistry: '$(ContainerRegistry)'
+        repository: '$(Repository)'
+        command: 'push'
+        tags: 'latest'
 
-# - stage: CD
-#   displayName: 'CD Stage'
-#   dependsOn: CI
+- stage: CD
+  displayName: 'CD Stage'
+  dependsOn: CI
 
-#   jobs:
-#   - deployment: Deploy
-#     displayName: 'Deploy to AKS'
-#     environment: '$(environment)'
-#     strategy:
-#       runOnce:
-#         deploy:
-#           steps:
-#           - task: DownloadPipelineArtifact@2
-#             inputs:
-#               buildType: 'current'
-#               artifactName: 'artifacts'
-#               targetPath: '$(Pipeline.Workspace)/artifacts'
+  jobs:
+  - deployment: Deploy
+    displayName: 'Deploy to AKS'
+    environment: '$(environment)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            inputs:
+              buildType: 'current'
+              artifactName: 'artifacts'
+              targetPath: '$(Pipeline.Workspace)/artifacts'
 
-#           - task: Kubernetes@1
-#             displayName: 'Deploying the manifest to AKS cluster'
-#             inputs:
-#               namespace: 'default'
-#               command: 'apply'
-#               arguments: '-f $(Pipeline.Workspace)/artifacts/deployment.yaml'
+          - task: Kubernetes@1
+            displayName: 'Deploying the manifest to AKS cluster'
+            inputs:
+              namespace: 'default'
+              command: 'apply'
+              arguments: '-f $(Pipeline.Workspace)/artifacts/deployment.yaml'
 
-#           - task: Kubernetes@1
-#             displayName: 'Setting up the Services'
-#             inputs:
-#               namespace: 'default'
-#               command: 'apply'
-#               arguments: '-f $(Pipeline.Workspace)/artifacts/service.yaml'
+          - task: Kubernetes@1
+            displayName: 'Setting up the Services'
+            inputs:
+              namespace: 'default'
+              command: 'apply'
+              arguments: '-f $(Pipeline.Workspace)/artifacts/service.yaml'
