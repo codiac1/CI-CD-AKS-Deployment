@@ -114,6 +114,7 @@ stages:
         deploy:
           steps:
           - task: DownloadPipelineArtifact@2
+            displayName: 'Downloading Pipeline Artifacts'
             inputs:
               buildType: 'current'
               artifactName: 'artifacts'
@@ -129,6 +130,7 @@ stages:
                 $(Pipeline.Workspace)/artifacts/service.yaml
               containers: '$(AcrDevUrl)/$(Repository):$(Build.BuildId)'
               imagePullSecrets: '$(acr-secret)'
+              
 
           # - task: Kubernetes@1
           #   displayName: 'Deploying the manifest to AKS cluster'
