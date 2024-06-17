@@ -63,13 +63,24 @@ stages:
     #     enableVerbose: true
     #     nvdApiKey: '$(NVDApiKey)'
 
-    - task: PublishPipelineArtifact@1
+    - task: CopyFiles@2
+      displayName: 'Copying files'
       inputs:
-        targetPath: |
-          $(Pipeline.Workspace)/s/deployment.yaml
-          $(Pipeline.Workspace)/s/service.yaml
-        artifact: 'drop'
-        publishLocation: 'pipeline'
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: |
+          target/**
+          deployment.yaml
+          service.yaml
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
+        OverWrite: true
+        flattenFolders: true
+        
+    - task: PublishBuildArtifacts@1
+      displayName: 'Publishing Artifacts'
+      inputs:
+        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+        ArtifactName: 'artifacts'
+        publishLocation: 'Container'
 
     # - task: Docker@2
     #   displayName: 'Build Docker Image'
@@ -103,19 +114,19 @@ stages:
 #           - task: DownloadPipelineArtifact@2
 #             inputs:
 #               buildType: 'current'
-#               artifactName: 'drop'
-#               targetPath: '$(Pipeline.Workspace)/drop'
+#               artifactName: 'artifacts'
+#               targetPath: '$(Pipeline.Workspace)/artifacts'
 
 #           - task: Kubernetes@1
 #             displayName: 'Deploying the manifest to AKS cluster'
 #             inputs:
 #               namespace: 'default'
 #               command: 'apply'
-#               arguments: '-f $(Pipeline.Workspace)/drop/deployment.yaml'
+#               arguments: '-f $(Pipeline.Workspace)/artifacts/deployment.yaml'
 
 #           - task: Kubernetes@1
 #             displayName: 'Setting up the Services'
 #             inputs:
 #               namespace: 'default'
 #               command: 'apply'
-#               arguments: '-f $(Pipeline.Workspace)/drop/service.yaml'
+#               arguments: '-f $(Pipeline.Workspace)/artifacts/service.yaml'
