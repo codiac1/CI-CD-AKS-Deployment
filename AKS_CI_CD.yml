@@ -66,18 +66,22 @@ stages:
     - task: CopyFiles@2
       displayName: 'Copying files'
       inputs:
-        SourceFolder: '$(Build.SourcesDirectory)/target'
-        Contents: '**/*.jar'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/target'
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: |
+          target/*.jar
+          deployment.yaml
+          service.yaml
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
         OverWrite: true
+        flattenFolders: true
         
     - task: PublishBuildArtifacts@1
       displayName: 'Publishing Artifacts'
       inputs:
         PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
+        ArtifactName: 'artifacts'
         publishLocation: 'Container'
-    
+
     - task: Docker@2
       displayName: 'Build Docker Image'
       inputs:
@@ -85,7 +89,8 @@ stages:
         repository: '$(Repository)'
         command: 'build'
         Dockerfile: 'Dockerfile'
-        tags: 'latest'
+        tags: |
+          $(Build.BuildId)
 
     - task: Docker@2
       displayName: 'Push Docker Image to ACR'
@@ -93,30 +98,37 @@ stages:
         containerRegistry: '$(ContainerRegistry)'
         repository: '$(Repository)'
         command: 'push'
-        tags: 'latest'
+        tags: |
+          $(Build.BuildId)
 
 - stage: CD
   displayName: 'CD Stage'
   dependsOn: CI
 
   jobs:
-  - job: Deploy
+  - deployment: Deploy
     displayName: 'Deploy to AKS'
-    steps:
-    - task: Kubernetes@1
-      displayName: 'Deploying the menifest to AKS cluster'
-      inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
-        namespace: 'default'
-        command: 'apply'
-        arguments: '-f deployment.yaml'
+    environment: '$(environment)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: DownloadPipelineArtifact@2
+            displayName: 'Downloading Pipeline Artifacts'
+            inputs:
+              buildType: 'current'
+              artifactName: 'artifacts'
+              targetPath: '$(Pipeline.Workspace)/artifacts'
 
-    - task: Kubernetes@1
-      displayName: 'Setting up the Services'
-      inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
-        namespace: 'default'
-        command: 'apply'
-        arguments: '-f service.yaml'
+          - task: KubernetesManifest@1
+            displayName: 'Deploying the manifest to AKS cluster'
+            inputs:
+              action: 'deploy'
+              connectionType: 'kubernetesServiceConnection'
+              namespace: 'default'
+              manifests: |
+                $(Pipeline.Workspace)/artifacts/deployment.yaml 
+                $(Pipeline.Workspace)/artifacts/service.yaml
+              containers: '$(AcrDevUrl)/$(Repository):$(Build.BuildId)'
+              imagePullSecrets: '$(acr-secret)'
+              
