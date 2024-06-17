@@ -100,23 +100,23 @@ stages:
   dependsOn: CI
 
   jobs:
-  - job: Deploy
+  - deployment: Deploy
     displayName: 'Deploy to AKS'
-    steps:
-    - task: Kubernetes@1
-      displayName: 'Deploying the menifest to AKS cluster'
-      inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
-        namespace: 'default'
-        command: 'apply'
-        arguments: '-f deployment.yaml'
+    environment: '$(environment)'
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+          - task: Kubernetes@1
+            displayName: 'Deploying the menifest to AKS cluster'
+            inputs:
+              namespace: 'default'
+              command: 'apply'
+              arguments: '-f deployment.yaml'
 
-    - task: Kubernetes@1
-      displayName: 'Setting up the Services'
-      inputs:
-        connectionType: 'Kubernetes Service Connection'
-        kubernetesServiceEndpoint: '$(KubernetesServiceEndpoint)'
-        namespace: 'default'
-        command: 'apply'
-        arguments: '-f service.yaml'
+          - task: Kubernetes@1
+            displayName: 'Setting up the Services'
+            inputs:
+              namespace: 'default'
+              command: 'apply'
+              arguments: '-f service.yaml'
