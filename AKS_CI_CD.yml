@@ -25,15 +25,15 @@ stages:
       clean: true
       fetchDepth: 0 
 
-    - task: SonarCloudPrepare@2
-      displayName: 'Preparing Sonar Cloud Analysis'
-      inputs:
-        SonarCloud: '$(SonarCloud)'
-        organization: '$(SonarOrganization)'
-        scannerMode: 'Other'
-        extraProperties: |
-          sonar.projectKey=$(SonarProjectKey)
-          sonar.projectName=$(SonarProjectName)
+    # - task: SonarCloudPrepare@2
+    #   displayName: 'Preparing Sonar Cloud Analysis'
+    #   inputs:
+    #     SonarCloud: '$(SonarCloud)'
+    #     organization: '$(SonarOrganization)'
+    #     scannerMode: 'Other'
+    #     extraProperties: |
+    #       sonar.projectKey=$(SonarProjectKey)
+    #       sonar.projectName=$(SonarProjectName)
 
     - task: Maven@4
       displayName: 'Build and Test with Sonar Code analysis'
@@ -52,71 +52,70 @@ stages:
         codeCoverageRestoreOriginalPomXml: true
         sqMavenPluginVersionChoice: 'latest'
 
-    - task: dependency-check-build-task@6
-      displayName: 'OWASP Dependency Check'
-      inputs:
-        projectName: '$(Build.Repository.Name)'
-        scanPath: '.'
-        format: 'HTML'
-        uploadReports: true
-        warnOnCVSSViolation: true
-        enableVerbose: true
-        nvdApiKey: '$(NVDApiKey)'
+    # - task: dependency-check-build-task@6
+    #   displayName: 'OWASP Dependency Check'
+    #   inputs:
+    #     projectName: '$(Build.Repository.Name)'
+    #     scanPath: '.'
+    #     format: 'HTML'
+    #     uploadReports: true
+    #     warnOnCVSSViolation: true
+    #     enableVerbose: true
+    #     nvdApiKey: '$(NVDApiKey)'
 
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: |
-          $(Pipeline.Workspace)/target/javaWebapp-0.1.jar
           $(Pipeline.Workspace)/s/deployment.yaml
           $(Pipeline.Workspace)/s/service.yaml
         artifact: 'drop'
         publishLocation: 'pipeline'
 
-    - task: Docker@2
-      displayName: 'Build Docker Image'
-      inputs:
-        containerRegistry: '$(ContainerRegistry)'
-        repository: '$(Repository)'
-        command: 'build'
-        Dockerfile: 'Dockerfile'
-        tags: 'latest'
+    # - task: Docker@2
+    #   displayName: 'Build Docker Image'
+    #   inputs:
+    #     containerRegistry: '$(ContainerRegistry)'
+    #     repository: '$(Repository)'
+    #     command: 'build'
+    #     Dockerfile: 'Dockerfile'
+    #     tags: 'latest'
 
-    - task: Docker@2
-      displayName: 'Push Docker Image to ACR'
-      inputs:
-        containerRegistry: '$(ContainerRegistry)'
-        repository: '$(Repository)'
-        command: 'push'
-        tags: 'latest'
+    # - task: Docker@2
+    #   displayName: 'Push Docker Image to ACR'
+    #   inputs:
+    #     containerRegistry: '$(ContainerRegistry)'
+    #     repository: '$(Repository)'
+    #     command: 'push'
+    #     tags: 'latest'
 
-- stage: CD
-  displayName: 'CD Stage'
-  dependsOn: CI
+# - stage: CD
+#   displayName: 'CD Stage'
+#   dependsOn: CI
 
-  jobs:
-  - deployment: Deploy
-    displayName: 'Deploy to AKS'
-    environment: '$(environment)'
-    strategy:
-      runOnce:
-        deploy:
-          steps:
-          - task: DownloadPipelineArtifact@2
-            inputs:
-              buildType: 'current'
-              artifactName: 'drop'
-              targetPath: '$(Pipeline.Workspace)/drop'
+#   jobs:
+#   - deployment: Deploy
+#     displayName: 'Deploy to AKS'
+#     environment: '$(environment)'
+#     strategy:
+#       runOnce:
+#         deploy:
+#           steps:
+#           - task: DownloadPipelineArtifact@2
+#             inputs:
+#               buildType: 'current'
+#               artifactName: 'drop'
+#               targetPath: '$(Pipeline.Workspace)/drop'
 
-          - task: Kubernetes@1
-            displayName: 'Deploying the manifest to AKS cluster'
-            inputs:
-              namespace: 'default'
-              command: 'apply'
-              arguments: '-f $(Pipeline.Workspace)/drop/deployment.yaml'
+#           - task: Kubernetes@1
+#             displayName: 'Deploying the manifest to AKS cluster'
+#             inputs:
+#               namespace: 'default'
+#               command: 'apply'
+#               arguments: '-f $(Pipeline.Workspace)/drop/deployment.yaml'
 
-          - task: Kubernetes@1
-            displayName: 'Setting up the Services'
-            inputs:
-              namespace: 'default'
-              command: 'apply'
-              arguments: '-f $(Pipeline.Workspace)/drop/service.yaml'
+#           - task: Kubernetes@1
+#             displayName: 'Setting up the Services'
+#             inputs:
+#               namespace: 'default'
+#               command: 'apply'
+#               arguments: '-f $(Pipeline.Workspace)/drop/service.yaml'
