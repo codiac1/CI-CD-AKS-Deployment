@@ -3,7 +3,6 @@ trigger:
 
 variables:
 - group: AKSVariables
-  
 
 pool:
   name: Azure-VM
@@ -53,16 +52,16 @@ stages:
         codeCoverageRestoreOriginalPomXml: true
         sqMavenPluginVersionChoice: 'latest'
 
-    # - task: dependency-check-build-task@6
-    #   displayName: 'OWASP Dependency Check'
-    #   inputs:
-    #     projectName: '$(Build.Repository.Name)'
-    #     scanPath: '.'
-    #     format: 'HTML'
-    #     uploadReports: true
-    #     warnOnCVSSViolation: true
-    #     enableVerbose: true
-    #     nvdApiKey: '$(NVDApiKey)'
+    - task: dependency-check-build-task@6
+      displayName: 'OWASP Dependency Check'
+      inputs:
+        projectName: '$(Build.Repository.Name)'
+        scanPath: '.'
+        format: 'HTML'
+        uploadReports: true
+        warnOnCVSSViolation: true
+        enableVerbose: true
+        nvdApiKey: '$(NVDApiKey)'
 
     - task: CopyFiles@2
       displayName: 'Copying files'
@@ -122,6 +121,7 @@ stages:
               targetPath: '$(Pipeline.Workspace)/artifacts'
 
           - task: KubernetesManifest@1
+            displayName: 'Deploying the manifest to AKS cluster'
             inputs:
               action: 'deploy'
               connectionType: 'kubernetesServiceConnection'
@@ -132,17 +132,3 @@ stages:
               containers: '$(AcrDevUrl)/$(Repository):$(Build.BuildId)'
               imagePullSecrets: '$(acr-secret)'
               
-
-          # - task: Kubernetes@1
-          #   displayName: 'Deploying the manifest to AKS cluster'
-          #   inputs:
-          #     namespace: 'default'
-          #     command: 'apply'
-          #     arguments: '-f $(Pipeline.Workspace)/artifacts/deployment.yaml'
-
-          # - task: Kubernetes@1
-          #   displayName: 'Setting up the Services'
-          #   inputs:
-          #     namespace: 'default'
-          #     command: 'apply'
-          #     arguments: '-f $(Pipeline.Workspace)/artifacts/service.yaml'
