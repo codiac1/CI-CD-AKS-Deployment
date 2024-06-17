@@ -64,19 +64,18 @@ stages:
         nvdApiKey: '$(NVDApiKey)'
 
     - task: CopyFiles@2
-      displayName: 'Copying files'
+      displayName: 'Copying JAR and manifest files'
       inputs:
-        SourceFolder: '$(Build.SourcesDirectory)/target'
-        Contents: '**/*.jar'
-        TargetFolder: '$(Build.ArtifactStagingDirectory)/target'
+        SourceFolder: '$(Build.SourcesDirectory)'
+        Contents: '**/*.jar,deployment.yaml,service.yaml'
+        TargetFolder: '$(Build.ArtifactStagingDirectory)'
         OverWrite: true
-        
-    - task: PublishBuildArtifacts@1
+
+    - task: PublishPipelineArtifact@1
       displayName: 'Publishing Artifacts'
       inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+        targetPath: '$(Build.ArtifactStagingDirectory)'
+        artifact: 'drop'
     
     - task: Docker@2
       displayName: 'Build Docker Image'
@@ -107,16 +106,19 @@ stages:
       runOnce:
         deploy:
           steps:
+          - download: current
+            artifact: drop
+
           - task: Kubernetes@1
-            displayName: 'Deploying the menifest to AKS cluster'
+            displayName: 'Deploying the manifest to AKS cluster'
             inputs:
               namespace: 'default'
               command: 'apply'
-              arguments: '-f deployment.yaml'
+              arguments: '-f $(Pipeline.Workspace)/drop/deployment.yaml'
 
           - task: Kubernetes@1
             displayName: 'Setting up the Services'
             inputs:
               namespace: 'default'
               command: 'apply'
-              arguments: '-f service.yaml'
+              arguments: '-f $(Pipeline.Workspace)/drop/service.yaml'
