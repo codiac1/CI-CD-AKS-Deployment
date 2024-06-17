@@ -66,9 +66,9 @@ stages:
     - task: PublishPipelineArtifact@1
       inputs:
         targetPath: |
-          $(Pipeline.Workspace)/target
-          $(Pipeline.Workspace)/deployment.yaml
-          $(Pipeline.Workspace)/service.yaml
+          $(Pipeline.Workspace)/target/javaWebapp-0.1.jar
+          $(Pipeline.Workspace)/s/deployment.yaml
+          $(Pipeline.Workspace)/s/service.yaml
         artifact: 'drop'
         publishLocation: 'pipeline'
 
