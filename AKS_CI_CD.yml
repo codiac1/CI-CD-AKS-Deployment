@@ -25,15 +25,15 @@ stages:
       clean: true
       fetchDepth: 0 
 
-    # - task: SonarCloudPrepare@2
-    #   displayName: 'Preparing Sonar Cloud Analysis'
-    #   inputs:
-    #     SonarCloud: '$(SonarCloud)'
-    #     organization: '$(SonarOrganization)'
-    #     scannerMode: 'Other'
-    #     extraProperties: |
-    #       sonar.projectKey=$(SonarProjectKey)
-    #       sonar.projectName=$(SonarProjectName)
+    - task: SonarCloudPrepare@2
+      displayName: 'Preparing Sonar Cloud Analysis'
+      inputs:
+        SonarCloud: '$(SonarCloud)'
+        organization: '$(SonarOrganization)'
+        scannerMode: 'Other'
+        extraProperties: |
+          sonar.projectKey=$(SonarProjectKey)
+          sonar.projectName=$(SonarProjectName)
 
     - task: Maven@4
       displayName: 'Build and Test with Sonar Code analysis'
