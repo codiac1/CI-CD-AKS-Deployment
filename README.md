@@ -31,15 +31,24 @@ cd CI-CD-AKS-Deployment
 
 ### Setting Up Azure DevOps CI/CD Pipeline
 
-1. **Create a New Pipeline:** In Azure DevOps, create a new pipeline and link it to your GitHub repository.
+1. **Create a New Pipeline:** 
 
-2. **Configure the Pipeline:** Use the AKS_CI_CD.yml file to configure the pipeline. This file contains steps for building the application, creating a Docker image, pushing the image to a container registry, and deploying the application to an AKS cluster.
+  - In Azure DevOps, create a new pipeline and link it to your GitHub repository.
+
+2. **Configure the Pipeline:** 
+
+  - Use the AKS_CI_CD.yml file to configure the pipeline. This file contains steps for building the application, creating a Docker image, pushing the image to a container        registry, and deploying the application to an AKS cluster.
 
 ### Verify the Deployment
 
-**Check the status of your pods and services to ensure the application is running correctly:**
+  - Check the status of your pods and services to ensure the application is running correctly:
 
 ```bash
 kubectl get pods
 kubectl get services
 ```
+## Conclusion ##
+
+This project demonstrates how to set up a CI/CD pipeline with Azure DevOps to deploy a Spring Boot Java web application to an AKS cluster. The AKS_CI_CD.yml file contains the necessary steps for building, pushing, and deploying the application.
+
+Feel free to explore and modify the project to fit your requirements.
